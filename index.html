@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Логический тренажёр: И vs ИЛИ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #eef2ff;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg: #0f172a;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Анимированный фон */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            color: var(--text);
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        h1 .and {
+            color: var(--primary);
+        }
+
+        h1 .or {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Прогресс */
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 10px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            width: 0%;
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px rgba(79, 70, 229, 0.5);
+        }
+
+        .progress-counter {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Карточка вопроса */
+        .question-card {
+            background: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%);
+            border: 2px solid var(--primary-light);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 24px;
+            font-size: 17px;
+            text-align: center;
+            line-height: 1.6;
+            font-weight: 500;
+            color: var(--text);
+            position: relative;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card .formula {
+            display: inline-block;
+            background: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 2px 10px;
+            font-family: 'Times New Roman', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 2px;
+        }
+
+        .question-card .formula.or-formula {
+            color: var(--accent);
+            border-color: #fef3c7;
+            background: #fffbeb;
+        }
+
+        .question-card .keyword {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .question-card .keyword.or-keyword {
+            color: var(--accent);
+        }
+
+        /* Кнопки ответа */
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        button.option-btn {
+            background: white;
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 18px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.3;
+        }
+
+        button.option-btn .op-symbol {
+            font-family: 'Times New Roman', serif;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        button.option-btn .op-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        button.option-btn[data-op="and"] .op-symbol { color: var(--primary); }
+        button.option-btn[data-op="or"] .op-symbol { color: var(--accent); }
+
+        button.option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -8px rgba(79, 70, 229, 0.3);
+        }
+
+        button.option-btn[data-op="or"]:hover:not(:disabled) {
+            border-color: var(--accent);
+            box-shadow: 0 12px 24px -8px rgba(245, 158, 11, 0.3);
+        }
+
+        button.option-btn:disabled {
+            cursor: default;
+        }
+
+        button.option-btn.correct {
+            background: var(--success-light) !important;
+            border-color: var(--success) !important;
+            animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        button.option-btn.correct .op-symbol,
+        button.option-btn.correct .op-name {
+            color: #065f46 !important;
+        }
+
+        button.option-btn.incorrect {
+            background: var(--danger-light) !important;
+            border-color: var(--danger) !important;
+            animation: shake 0.4s ease;
+        }
+
+        button.option-btn.incorrect .op-symbol,
+        button.option-btn.incorrect .op-name {
+            color: #991b1b !important;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* Фидбэк */
+        #feedback {
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            min-height: 24px;
+            margin-bottom: 16px;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        #feedback.show-success {
+            background: var(--success-light);
+            color: #065f46;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #feedback.show-danger {
+            background: var(--danger-light);
+            color: #991b1b;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Кнопка далее */
+        #next-btn {
+            display: none;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        #next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -6px rgba(79, 70, 229, 0.6);
+        }
+
+        #next-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Результаты */
+        .results {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-icon {
+            font-size: 64px;
+            margin-bottom: 12px;
+            animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .results h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .results p {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .score-badge {
+            display: inline-block;
+            font-size: 44px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .result-message {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.5);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -6px rgba(79, 70, 229, 0.6);
+        }
+
+        /* Адаптив */
+        @media (max-width: 520px) {
+            .container { padding: 28px 20px; }
+            h1 { font-size: 22px; }
+            .options { grid-template-columns: 1fr; }
+            .question-card { font-size: 15px; padding: 20px; }
+            .score-badge { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="badge">8 класс · Информатика</div>
+        <h1>Логический тренажёр <span class="and">И</span> vs <span class="or">ИЛИ</span></h1>
+        <div class="subtitle">Определите тип логической операции</div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="progress-wrapper">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <div class="progress-counter" id="progress-counter">0 / 8</div>
+        </div>
+
+        <div class="question-card" id="question-text">Загрузка вопроса...</div>
+
+        <div class="options">
+            <button class="option-btn" data-op="and" onclick="checkAnswer('Конъюнкция')">
+                <span class="op-symbol">∧</span>
+                <span class="op-name">Конъюнкция (И)</span>
+            </button>
+            <button class="option-btn" data-op="or" onclick="checkAnswer('Дизъюнкция')">
+                <span class="op-symbol">∨</span>
+                <span class="op-name">Дизъюнкция (ИЛИ)</span>
+            </button>
+        </div>
+
+        <div id="feedback"></div>
+        <button id="next-btn" onclick="nextQuestion()">Следующий вопрос →</button>
+    </div>
+
+    <div class="results" id="results-screen">
+        <div class="results-icon" id="results-icon">🎉</div>
+        <h2>Тест завершён!</h2>
+        <p>Ваш результат:</p>
+        <div class="score-badge" id="final-score">0 / 0</div>
+        <p class="result-message" id="result-message"></p>
+        <button class="restart-btn" onclick="restartQuiz()">Пройти снова</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: '«Чтобы пойти в кино, нужно купить билет <span class="keyword">И</span> дождаться субботы». Какая операция связывает условия?',
+            answer: 'Конъюнкция'
+        },
+        {
+            question: '«На завтрак я выпью чай <span class="keyword or-keyword">ИЛИ</span> кофе». Какая логическая операция здесь используется?',
+            answer: 'Дизъюнкция'
+        },
+        {
+            question: 'Логическое выражение: <span class="formula">A ∧ B</span>',
+            answer: 'Конъюнкция'
+        },
+        {
+            question: 'Логическое выражение: <span class="formula or-formula">X ∨ Y</span>',
+            answer: 'Дизъюнкция'
+        },
+        {
+            question: '«Урок отменят, если пойдёт дождь <span class="keyword or-keyword">ИЛИ</span> отключат свет».',
+            answer: 'Дизъюнкция'
+        },
+        {
+            question: '«Число должно быть больше 5 <span class="keyword">И</span> меньше 10 одновременно».',
+            answer: 'Конъюнкция'
+        },
+        {
+            question: 'Союз <span class="keyword">«И»</span> в естественном языке соответствует...',
+            answer: 'Конъюнкция'
+        },
+        {
+            question: 'Операция истинна тогда и только тогда, когда <b>оба</b> высказывания истинны.',
+            answer: 'Конъюнкция'
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionText = document.getElementById('question-text');
+    const progressFill = document.getElementById('progress');
+    const progressCounter = document.getElementById('progress-counter');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const finalScore = document.getElementById('final-score');
+    const resultMessage = document.getElementById('result-message');
+    const resultsIcon = document.getElementById('results-icon');
+
+    function loadQuestion() {
+        answered = false;
+        feedback.textContent = '';
+        feedback.className = '';
+        nextBtn.style.display = 'none';
+
+        const q = quizData[currentQuestion];
+        questionText.innerHTML = q.question;
+        questionText.style.animation = 'none';
+        void questionText.offsetWidth; // reflow
+        questionText.style.animation = 'fadeIn 0.4s ease';
+
+        // Прогресс
+        const progressPercent = (currentQuestion / quizData.length) * 100;
+        progressFill.style.width = progressPercent + '%';
+        progressCounter.textContent = `${currentQuestion + 1} / ${quizData.length}`;
+
+        // Сброс кнопок
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('correct', 'incorrect');
+            btn.disabled = false;
+        });
+    }
+
+    function checkAnswer(selectedOption) {
+        if (answered) return;
+        answered = true;
+
+        const q = quizData[currentQuestion];
+        const buttons = document.querySelectorAll('.option-btn');
+
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            const op = btn.dataset.op;
+            const isCorrect = (op === 'and' && q.answer === 'Конъюнкция') ||
+                              (op === 'or' && q.answer === 'Дизъюнкция');
+            if (isCorrect) btn.classList.add('correct');
+        });
+
+        if (selectedOption === q.answer) {
+            score++;
+            feedback.textContent = '✓ Верно! Отличная работа.';
+            feedback.className = 'show-success';
+        } else {
+            // Находим кнопку, которую нажали
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                const op = btn.dataset.op;
+                const isSelected = (op === 'and' && selectedOption === 'Конъюнкция') ||
+                                   (op === 'or' && selectedOption === 'Дизъюнкция');
+                if (isSelected) btn.classList.add('incorrect');
+            });
+            feedback.textContent = `✗ Ошибка! Правильный ответ: ${q.answer}`;
+            feedback.className = 'show-danger';
+        }
+
+        progressFill.style.width = ((currentQuestion + 1) / quizData.length) * 100 + '%';
+        nextBtn.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizScreen.style.display = 'none';
+        resultsScreen.style.display = 'block';
+        finalScore.textContent = `${score} / ${quizData.length}`;
+
+        const percent = (score / quizData.length) * 100;
+        if (percent === 100) {
+            resultsIcon.textContent = '🏆';
+            resultMessage.textContent = 'Великолепно! Вы отлично усвоили тему конъюнкции и дизъюнкции!';
+        } else if (percent >= 70) {
+            resultsIcon.textContent = '👍';
+            resultMessage.textContent = 'Хороший результат! Почти без ошибок. Есть куда расти.';
+        } else if (percent >= 40) {
+            resultsIcon.textContent = '📚';
+            resultMessage.textContent = 'Неплохо, но стоит ещё раз повторить правила конъюнкции и дизъюнкции.';
+        } else {
+            resultsIcon.textContent = '💪';
+            resultMessage.textContent = 'Не расстраивайтесь! Повторите тему и попробуйте снова — всё получится.';
+        }
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        quizScreen.style.display = 'block';
+        resultsScreen.style.display = 'none';
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
